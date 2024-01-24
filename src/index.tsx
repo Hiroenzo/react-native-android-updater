@@ -1,12 +1,8 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 
-const LINKING_ERROR =
-  `The package 'react-native-android-updater' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
+const LINKING_ERROR = '请检查是否正确引用AndroidUpdater模块';
 
-const AndroidUpdater = NativeModules.AndroidUpdater
+const AndroidUpdaterModule = NativeModules.AndroidUpdater
   ? NativeModules.AndroidUpdater
   : new Proxy(
       {},
@@ -17,6 +13,51 @@ const AndroidUpdater = NativeModules.AndroidUpdater
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return AndroidUpdater.multiply(a, b);
-}
+export const AndroidUpdaterEmitter = new NativeEventEmitter(
+  AndroidUpdaterModule
+);
+
+export type AndroidUpdaterProps = {
+  url: string;
+  md5?: string;
+};
+
+export type AndroidUpdaterResultProps = {
+  downUrl: string;
+  description: string;
+  versionName: string;
+  versionCode: string;
+  updateType: number;
+  size?: number | string;
+};
+
+/**
+ * 下载并安装apk
+ * @param props
+ */
+export const downloadApk = (props: AndroidUpdaterProps): Promise<boolean> => {
+  if (Platform.OS === 'ios') {
+    return Promise.resolve(true);
+  }
+  return AndroidUpdaterModule.downloadApk(props);
+};
+
+/**
+ * 取消下载
+ */
+export const cancelDownloadApk = (): Promise<boolean> => {
+  if (Platform.OS === 'ios') {
+    return Promise.resolve(true);
+  }
+  return AndroidUpdaterModule.cancelDownloadApk();
+};
+
+/**
+ * 安装
+ */
+export const installApk = (): Promise<boolean> => {
+  if (Platform.OS === 'ios') {
+    return Promise.resolve(true);
+  }
+  return AndroidUpdaterModule.installApk();
+};
