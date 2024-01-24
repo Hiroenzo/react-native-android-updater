@@ -8,15 +8,24 @@ React native android updater
 npm install react-native-android-updater
 ```
 
+or
+
+```sh
+yarn add react-native-android-updater
+```
+
 ## Usage
 
-```js
-import { multiply } from 'react-native-android-updater';
+| Methods           | Params                      | Descriptions            |
+| ----------------- | --------------------------- |-------------------------|
+| downloadApk       | {url: string, md5?: string} | Start to download apk   |
+| cancelDownloadApk |                             | Cancel Download process |
+| installApk        |                             | Install downloaded apk  |
 
-// ...
+## Feature
 
-const result = await multiply(3, 7);
-```
+- [ ] Update info dialog
+- [ ] download progress
 
 ## Contributing
 
