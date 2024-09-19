@@ -92,6 +92,6 @@ dependencies {
   //noinspection GradleDependency
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-  implementation 'io.github.azhon:appupdate:4.3.2' // <- AppUpdate: https://github.com/azhon/AppUpdate
+  implementation 'io.github.azhon:appupdate:4.3.4' // <- AppUpdate: https://github.com/azhon/AppUpdate
 }
 

@@ -29,6 +29,7 @@ export type AndroidUpdaterResultProps = {
   versionCode: string;
   updateType: number;
   size?: number | string;
+  md5?: string;
 };
 
 /**

@@ -1,14 +1,14 @@
 package com.androidupdater
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.util.Log
 
-import androidx.core.content.FileProvider
+import com.azhon.appupdate.config.Constant
+import com.azhon.appupdate.listener.OnDownloadListenerAdapter
+import com.azhon.appupdate.manager.DownloadManager
+import com.azhon.appupdate.util.ApkUtil
 
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
@@ -17,10 +17,6 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.Promise
 import com.facebook.react.modules.core.DeviceEventManagerModule
-
-import com.azhon.appupdate.listener.OnDownloadListenerAdapter
-import com.azhon.appupdate.manager.DownloadManager
-import com.azhon.appupdate.util.ApkUtil
 
 import java.io.File
 
@@ -111,20 +107,9 @@ class AndroidUpdaterModule(reactContext: ReactApplicationContext) :
         promise.reject("InstallAPKError", "activity is null")
         return
       }
-      val intent = Intent(Intent.ACTION_VIEW)
-      val filePath = activity.application.externalCacheDir!!.path + "/" + apkName
-      val apk = File(filePath)
+      val apk = File("${String.format(Constant.APK_PATH, context.packageName)}/${apkName}")
       if (apk.exists()) {
-        //判断是否是AndroidN以及更高的版本
-        val uri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-          intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
-          FileProvider.getUriForFile(context, context.packageName + ".fileProvider", apk)
-        } else {
-          intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-          Uri.fromFile(apk)
-        }
-        intent.setDataAndType(uri, "application/vnd.android.package-archive")
-        context.startActivity(intent)
+        ApkUtil.installApk(context, Constant.AUTHORITIES!!, apk)
         promise.resolve(true)
       } else {
         promise.reject("InstallAPKError", "安装文件不存在")
@@ -146,8 +131,7 @@ class AndroidUpdaterModule(reactContext: ReactApplicationContext) :
         promise.reject("InstallAPKError", "activity is null")
         return
       }
-      val filePath = activity.application.externalCacheDir!!.path + "/" + apkName
-      val result = ApkUtil.deleteOldApk(context, filePath)
+      val result = ApkUtil.deleteOldApk(context, "${String.format(Constant.APK_PATH, context.packageName)}/${apkName}")
       promise.resolve(result)
     } catch (ex: Exception) {
       Log.d(LOG_TAG, ex.toString())
@@ -170,6 +154,11 @@ class AndroidUpdaterModule(reactContext: ReactApplicationContext) :
     override fun downloading(max: Int, progress: Int) {
       val curr = (progress / max.toDouble() * 100.0).toInt()
       sendEvent(context as ReactContext, curr)
+    }
+
+    override fun done(apk: File) {
+      super.done(apk)
+      sendEvent(context as ReactContext, 100)
     }
   }
 
