@@ -51,7 +51,7 @@ class AndroidUpdaterModule(reactContext: ReactApplicationContext) :
     try {
       val url = params.getString("url")
       var md5 = params.getString("md5")
-      val activity = currentActivity
+      val activity = reactApplicationContext.currentActivity
       if (activity == null) {
         promise.reject("DownloadAPKError", "activity is null")
         return
@@ -102,7 +102,7 @@ class AndroidUpdaterModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun installApk(promise: Promise) {
     try {
-      val activity = currentActivity
+      val activity = reactApplicationContext.currentActivity
       if (activity == null) {
         promise.reject("InstallAPKError", "activity is null")
         return
@@ -126,7 +126,7 @@ class AndroidUpdaterModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun deleteApk(promise: Promise) {
     try {
-      val activity = currentActivity
+      val activity = reactApplicationContext.currentActivity
       if (activity == null) {
         promise.reject("InstallAPKError", "activity is null")
         return
